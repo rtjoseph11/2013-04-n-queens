@@ -16,6 +16,14 @@
       }, this);
     },
 
+    cols: function(){
+      return _.map(_.range(this.get('n')), function(value, index){
+        return _.map(this.rows(), function(val, ind){
+          return val[index];
+        }, this);
+      }, this);
+    },
+
     togglePiece: function(rowIndex, colIndex){
       this.get(rowIndex)[colIndex] = + !this.get(rowIndex)[colIndex];
       this.trigger('change');
@@ -58,35 +66,85 @@
     // todo: fill in all these functions - they'll help you!
 
     hasRowConflictAt: function(rowIndex){
-      return false; // fixme
+      var rowSum = _(this.get(rowIndex)).reduce(function(memo, value){
+        return memo + value;
+      }, 0);
+      return rowSum > 1;
     },
 
     hasAnyRowConflicts: function(){
-      return false; // fixme
+      return !!_(this.rows()).reduce(function(memo, row, index){
+        return memo || this.hasRowConflictAt(index);
+      }, false, this);
     },
 
     hasColConflictAt: function(colIndex){
-      return false; // fixme
+      var colSum = _(this.cols()[colIndex]).reduce(function(memo, value){
+        return memo + value;
+      }, 0);
+      return colSum > 1;
     },
 
     hasAnyColConflicts: function(){
-      return false; // fixme
+      return !!_(this.cols()).reduce(function(memo, col, index){
+        return memo || this.hasColConflictAt(index);
+      }, false, this);
     },
 
     hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow){
-      return false; // fixme
+      var diag = [];
+      var colIndex;
+      var rowIndex;
+      if (majorDiagonalColumnIndexAtFirstRow < 0 ){
+        colIndex = 0;
+        rowIndex = Math.abs(majorDiagonalColumnIndexAtFirstRow);
+      } else {
+        colIndex = majorDiagonalColumnIndexAtFirstRow;
+        rowIndex = 0;
+      }
+      while(this._isInBounds(rowIndex, colIndex)){
+        diag.push(this.rows()[rowIndex][colIndex]);
+        rowIndex++;
+        colIndex++;
+      }
+      var diagSum = _(diag).reduce(function(memo, value){
+        return memo + value;
+      }, 0);
+      return diagSum > 1;
     },
 
     hasAnyMajorDiagonalConflicts: function(){
-      return false; // fixme
+      return _(_.range(-(this.get('n') - 1), this.get('n'))).reduce(function(memo, value){
+        return memo || this.hasMajorDiagonalConflictAt(value);
+      }, false, this);
     },
 
     hasMinorDiagonalConflictAt: function(minorDiagonalColumnIndexAtFirstRow){
-      return false; // fixme
+      var diag = [];
+      var colIndex;
+      var rowIndex;
+      if (minorDiagonalColumnIndexAtFirstRow < this.get('n')){
+        colIndex = minorDiagonalColumnIndexAtFirstRow;
+        rowIndex = 0;
+      } else {
+        colIndex = this.get('n') - 1;
+        rowIndex = minorDiagonalColumnIndexAtFirstRow - colIndex;
+      }
+      while(this._isInBounds(rowIndex, colIndex)){
+        diag.push(this.rows()[rowIndex][colIndex]);
+        rowIndex++;
+        colIndex--;
+      }
+      var diagSum = _(diag).reduce(function(memo, value){
+        return memo + value;
+      }, 0);
+      return diagSum > 1;
     },
 
     hasAnyMinorDiagonalConflicts: function(){
-      return false; // fixme
+      return _(_.range(2 * this.get('n') -1)).reduce(function(memo, value){
+        return memo || this.hasMinorDiagonalConflictAt(value);
+      }, false, this);
     }
 
   });

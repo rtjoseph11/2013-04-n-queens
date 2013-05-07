@@ -20,12 +20,7 @@ window.countNRooksSolutions = function(n){
   var solutionCount = 0;
   var solutions = [];
   rtraverse('rook', makeEmptyMatrix(n), 0, n, solutions);
-  _.each(solutions, function(solution, index){
-    var checker = new Board(solution);
-    if (!checker.hasAnyRooksConflicts()){
-      solutionCount++;
-    }
-  });
+  solutionCount = solutions.length;
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
@@ -33,15 +28,8 @@ window.countNRooksSolutions = function(n){
 window.findNQueensSolution = function(n){
   var solution = [];
   var solutions = [];
-  rtraverse('rook', makeEmptyMatrix(n), 0, n, solutions);
-  for (var i = 0; i < solutions.length; i++){
-    var checker = new Board(solutions[i]);
-    if (!checker.hasAnyQueensConflicts()){
-      solution = solutions[i];
-      break;
-    }
-  }
-
+  rtraverse('queen', makeEmptyMatrix(n), 0, n, solutions);
+  solution = solutions[0] || [];
   console.log('Single solution for ' + n + ' queens:', solution);
   return solution;
 };
@@ -49,14 +37,8 @@ window.findNQueensSolution = function(n){
 window.countNQueensSolutions = function(n){
   solutionCount = 0;
   var solutions = [];
-  rtraverse('rook', makeEmptyMatrix(n), 0, n, solutions);
-  _.each(solutions, function(solution, index){
-    var checker = new Board(solution);
-    if (!checker.hasAnyQueensConflicts()){
-      solutionCount++;
-    }
-  });
-
+  rtraverse('queen', makeEmptyMatrix(n), 0, n, solutions);
+  solutionCount = solutions.length;
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
@@ -98,21 +80,57 @@ window.rookChecker = function(matrix){
   return false;
 };
 
-window.queenCheck = function(matrix){
+window.queenChecker = function(matrix){
   if (rookChecker(matrix)){
     return true;
   } else {
-    hasMajorConflict = false;
+    var colIndex;
+    var rowIndex;
+    var sum;
     for (var i = - (matrix.length -1); i < matrix.length; i++){
-    var majorDiag = 0;
-     //sum major diags
+      if (i < 0 ){
+        colIndex = 0;
+        rowIndex = Math.abs(i);
+      } else {
+        colIndex = i;
+        rowIndex = 0;
+      }
+      sum = 0;
+      while(isInBounds(matrix.length,rowIndex, colIndex)){
+        sum += matrix[rowIndex][colIndex];
+        rowIndex++;
+        colIndex++;
+        if (sum >1){
+          return true;
+        }
+      }
     }
-    if (! hasMajorConflict){
-      for (var j = 0; j < 2 * matrix.length - 2; j++){
-
-      }  
+    for (var j = 0; j < 2 * matrix.length - 2; j++){
+      if (j < matrix.length){
+        colIndex = j;
+        rowIndex = 0;
+      } else {
+        colIndex = matrix.length - 1;
+        rowIndex = j - colIndex;
+      }
+      sum = 0;
+      while(isInBounds(matrix.length,rowIndex, colIndex)){
+        sum += matrix[rowIndex][colIndex];
+        rowIndex++;
+        colIndex--;
+        if (sum > 1){
+          return true;
+        }
+      }
     }
   }
+};
+
+window.isInBounds = function(n, rowIndex, colIndex){
+      return (
+        0 <= rowIndex && rowIndex < n &&
+        0 <= colIndex && colIndex < n
+      );
 };
 
 window.makeEmptyMatrix = function(n){

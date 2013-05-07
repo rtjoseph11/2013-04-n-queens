@@ -89,7 +89,6 @@
     },
 
     hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow){
-      var diag = [];
       var colIndex;
       var rowIndex;
       if (majorDiagonalColumnIndexAtFirstRow < 0 ){
@@ -99,15 +98,13 @@
         colIndex = majorDiagonalColumnIndexAtFirstRow;
         rowIndex = 0;
       }
+      var sum = 0;
       while(this._isInBounds(rowIndex, colIndex)){
-        diag.push(this.rows()[rowIndex][colIndex]);
+        sum += this.rows()[rowIndex][colIndex];
         rowIndex++;
         colIndex++;
       }
-      var diagSum = _(diag).reduce(function(memo, value){
-        return memo + value;
-      }, 0);
-      return diagSum > 1;
+      return sum > 1;
     },
 
     hasAnyMajorDiagonalConflicts: function(){
@@ -117,7 +114,6 @@
     },
 
     hasMinorDiagonalConflictAt: function(minorDiagonalColumnIndexAtFirstRow){
-      var diag = [];
       var colIndex;
       var rowIndex;
       if (minorDiagonalColumnIndexAtFirstRow < this.get('n')){
@@ -127,15 +123,13 @@
         colIndex = this.get('n') - 1;
         rowIndex = minorDiagonalColumnIndexAtFirstRow - colIndex;
       }
+      var sum = 0;
       while(this._isInBounds(rowIndex, colIndex)){
-        diag.push(this.rows()[rowIndex][colIndex]);
+        sum += this.rows()[rowIndex][colIndex];
         rowIndex++;
         colIndex--;
       }
-      var diagSum = _(diag).reduce(function(memo, value){
-        return memo + value;
-      }, 0);
-      return diagSum > 1;
+      return sum > 1;
     },
 
     hasAnyMinorDiagonalConflicts: function(){

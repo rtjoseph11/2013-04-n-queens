@@ -98,6 +98,23 @@ window.rookChecker = function(matrix){
   return false;
 };
 
+window.queenCheck = function(matrix){
+  if (rookChecker(matrix)){
+    return true;
+  } else {
+    hasMajorConflict = false;
+    for (var i = - (matrix.length -1); i < matrix.length; i++){
+    var majorDiag = 0;
+     //sum major diags
+    }
+    if (! hasMajorConflict){
+      for (var j = 0; j < 2 * matrix.length - 2; j++){
+
+      }  
+    }
+  }
+};
+
 window.makeEmptyMatrix = function(n){
   return _(_.range(n)).map(function(){
     return _(_.range(n)).map(function(){

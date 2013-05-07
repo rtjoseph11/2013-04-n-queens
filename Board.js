@@ -62,9 +62,6 @@
       );
     },
 
-
-    // todo: fill in all these functions - they'll help you!
-
     hasRowConflictAt: function(rowIndex){
       var rowSum = _(this.get(rowIndex)).reduce(function(memo, value){
         return memo + value;

@@ -18,9 +18,21 @@ window.findNRooksSolution = function(n){
 
 window.countNRooksSolutions = function(n){
   var solutionCount = 0;
-  var solutions = [];
-  rtraverse('rook', makeEmptyMatrix(n), 0, n, solutions);
-  solutionCount = solutions.length;
+  var colHash = {};
+  var rookTraverse = function(array){
+    if (array.length === n){
+      solutionCount++;
+    } else {
+    for (var i = 0; i < n; i++){
+      if (!colHash[i]){
+        colHash[i] = true;
+        rookTraverse(array.concat(i));
+        delete colHash[i];
+        }
+      }
+    }
+  };
+  rookTraverse([]);
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
@@ -28,120 +40,78 @@ window.countNRooksSolutions = function(n){
 window.findNQueensSolution = function(n){
   var solution = [];
   var solutions = [];
-  rtraverse('queen', makeEmptyMatrix(n), 0, n, solutions);
-  solution = solutions[0] || [];
-  console.log('Single solution for ' + n + ' queens:', solution);
-  return solution;
+  var colHash = {};
+  var majorDiagHash = {};
+  var minorDiagHash = {};
+  var queenTraverse = function(array){
+    if (array.length ===n){
+    solutions.push(array);
+  } else {
+    for (var i = 0; i < n; i++){
+      if (!colHash[i] && !majorDiagHash[array.length - i -1] && !minorDiagHash[array.length + i - 1]){
+        colHash[i] = true;
+        majorDiagHash[array.length - i - 1] = true;
+        minorDiagHash[array.length + i - 1] = true;
+        queenTraverse(array.concat(i));
+        delete colHash[i];
+        delete majorDiagHash[array.length - i - 1];
+        delete minorDiagHash[array.length + i - 1];
+        }
+      }
+    }
+  };
+  queenTraverse([]);
+  if(solutions[0]){
+    solution = makeEmptyMatrix(n);
+    for (var i = 0; i < n; i++){
+      for (var j = 0; j < n; j++){
+         if(solutions[0][i] === j){
+          solution[i][j] = 1;
+         }
+      }
+    }
+    console.log('Single solution for ' + n + ' queens:', solution);
+    return solution;
+  }
+  else {
+    return [];
+  }
 };
 
 window.countNQueensSolutions = function(n){
-  solutionCount = 0;
-  var solutions = [];
-  rtraverse('queen', makeEmptyMatrix(n), 0, n, solutions);
-  solutionCount = solutions.length;
+  var solutionCount = 0;
+  var colHash = {};
+  var majorDiagHash = {};
+  var minorDiagHash = {};
+  var queenTraverse = function(array){
+    if (array.length ===n){
+    solutionCount++;
+  } else {
+    for (var i = 0; i < n; i++){
+      if (!colHash[i] && !majorDiagHash[array.length - i -1] && !minorDiagHash[array.length + i - 1]){
+        colHash[i] = true;
+        majorDiagHash[array.length - i - 1] = true;
+        minorDiagHash[array.length + i - 1] = true;
+        queenTraverse(array.concat(i));
+        delete colHash[i];
+        delete majorDiagHash[array.length - i - 1];
+        delete minorDiagHash[array.length + i - 1];
+        }
+      }
+    }
+  };
+  queenTraverse([]);
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
 
-window.incrementMatrix = function(matrix, i ,j){
-  return _(matrix).map(function(item, index){
-     if(index === i){
-      var temp = Array.prototype.slice.call(item, 0);
-      temp[j] = temp[j] + 1;
-      return temp;
-     }
-     return item;
-  });
-};
-
-window.rtraverse = function(type, matrix, row, n, solutions){
-  if (row ===n){
-    solutions.push(matrix);
-  } else {
-    for (var i = 0; i < n; i++){
-      var newMatrix = incrementMatrix(matrix, row, i);
-      if(!window[type + 'Checker'](newMatrix)){
-        rtraverse(type, newMatrix, row +1, n, solutions);
-      }
-    }
-  }
-};
-
-window.rookChecker = function(matrix){
-  for (var i = 0; i < matrix.length; i++){
-    var count = 0;
-    for (var j = 0; j <matrix.length; j++){
-      count += matrix[j][i];
-      if(count > 1){
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
-window.queenChecker = function(matrix){
-  if (rookChecker(matrix)){
-    return true;
-  } else {
-    var colIndex;
-    var rowIndex;
-    var sum;
-    for (var i = - (matrix.length -1); i < matrix.length; i++){
-      if (i < 0 ){
-        colIndex = 0;
-        rowIndex = Math.abs(i);
-      } else {
-        colIndex = i;
-        rowIndex = 0;
-      }
-      sum = 0;
-      while(isInBounds(matrix.length,rowIndex, colIndex)){
-        sum += matrix[rowIndex][colIndex];
-        rowIndex++;
-        colIndex++;
-        if (sum >1){
-          return true;
-        }
-      }
-    }
-    for (var j = 0; j < 2 * matrix.length - 2; j++){
-      if (j < matrix.length){
-        colIndex = j;
-        rowIndex = 0;
-      } else {
-        colIndex = matrix.length - 1;
-        rowIndex = j - colIndex;
-      }
-      sum = 0;
-      while(isInBounds(matrix.length,rowIndex, colIndex)){
-        sum += matrix[rowIndex][colIndex];
-        rowIndex++;
-        colIndex--;
-        if (sum > 1){
-          return true;
-        }
-      }
-    }
-  }
-};
-
-window.isInBounds = function(n, rowIndex, colIndex){
-      return (
-        0 <= rowIndex && rowIndex < n &&
-        0 <= colIndex && colIndex < n
-      );
-};
-
 window.makeEmptyMatrix = function(n){
-  return _(_.range(n)).map(function(){
     return _(_.range(n)).map(function(){
-      return 0;
+      return _(_.range(n)).map(function(){
+        return 0;
+      });
     });
-  });
-};
-
-// This function uses a board visualizer lets you view an interactive version of any piece matrix.
+  };
 
 window.displayBoard = function(matrix){
   $('body').html(

@@ -63,10 +63,9 @@
     },
 
     hasRowConflictAt: function(rowIndex){
-      var rowSum = _(this.get(rowIndex)).reduce(function(memo, value){
+      return _(this.get(rowIndex)).reduce(function(memo, value){
         return memo + value;
-      }, 0);
-      return rowSum > 1;
+      }, 0) > 1;
     },
 
     hasAnyRowConflicts: function(){
@@ -76,10 +75,9 @@
     },
 
     hasColConflictAt: function(colIndex){
-      var colSum = _(this.cols()[colIndex]).reduce(function(memo, value){
+      return _(this.cols()[colIndex]).reduce(function(memo, value){
         return memo + value;
-      }, 0);
-      return colSum > 1;
+      }, 0) > 1;
     },
 
     hasAnyColConflicts: function(){
